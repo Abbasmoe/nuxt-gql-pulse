@@ -1,5 +1,5 @@
 import type { DocumentNode, OperationDefinitionNode } from 'graphql'
-import type { AsyncDataOptions } from '#app'
+import type { AsyncDataOptions, AsyncData } from 'nuxt/app'
 import type { TVariables, TKeysOf } from '../../module'
 import type { TClients } from '#build/types/gql-pulse.d.ts'
 import { useGqlPulseRequest } from './useGqlPulseRequest'
@@ -8,7 +8,7 @@ import { useAsyncData, useNuxtApp } from '#app'
 export const useAsyncGqlPulse = async <
   ResT,
   NuxtErrorDataT = unknown,
-  DataT = ResT,
+  DataT extends ResT = ResT,
   PickKeys extends TKeysOf<DataT> = TKeysOf<DataT>,
   DefaultT = DataT | null,
 >(cxt: {
@@ -18,7 +18,7 @@ export const useAsyncGqlPulse = async <
   client?: TClients
   withPayloadCache?: boolean
   options?: Omit<AsyncDataOptions<ResT, DataT, PickKeys, DefaultT>, 'lazy'>
-}) => {
+}): Promise<AsyncData<ResT, NuxtErrorDataT> & AsyncData<ResT, Error>> => {
   const nuxtApp = useNuxtApp()
 
   const payloadCache = cxt.withPayloadCache
@@ -40,5 +40,5 @@ export const useAsyncGqlPulse = async <
       }),
 
     { ...cxt.options, ...payloadCache },
-  )
+  ) as AsyncData<ResT, NuxtErrorDataT> & AsyncData<ResT, Error>
 }

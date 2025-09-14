@@ -1,4 +1,4 @@
-import type { AsyncDataOptions } from '#app'
+import type { AsyncDataOptions } from 'nuxt/app'
 import type { DocumentNode } from 'graphql'
 import type { TVariables, TKeysOf } from '../../module'
 import type { TClients } from '#build/types/gql-pulse.d.ts'
@@ -19,7 +19,7 @@ export type TPickFrom<T, K extends Array<string>>
 export const useAsyncGqlPulseWithCache = async <
   ResT,
   NuxtErrorDataT = unknown,
-  DataT = ResT,
+  DataT extends ResT = ResT,
   PickKeys extends TKeysOf<DataT> = TKeysOf<DataT>,
   DefaultT = DataT | null,
 >(cxt: {
