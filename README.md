@@ -233,73 +233,104 @@ export {}
 🔁 Caching: SSR vs SPA
 
 - withPayloadCache / useAsyncGqlPulse → SSR-friendly, data is stored in Nuxt payload and reused during client hydration (no double-fetch).
-- *WithCache variants & useGqlPulseRequestWithCache → SPA only (use sessionStorage via @vueuse/core). 
-Use these for client-persistent caching across reloads; not suitable for SSR-only pages.
+- \*WithCache variants & useGqlPulseRequestWithCache → SPA only (use sessionStorage via @vueuse/core).
+  Use these for client-persistent caching across reloads; not suitable for SSR-only pages.
 
 #### 🔧 API details
 
 **useGqlPulseRequest**
 
-```vue
-// Make standard GraphQL requests. const data = await useGqlPulseRequest({
-document, // string | DocumentNode client: string, // defaults to first client
-variables: TVariables, })
+```ts
+// Make standard GraphQL requests.
+const data = await useGqlPulseRequest({
+  document, // string | DocumentNode 
+  client: string, // defaults to first client
+  variables: TVariables,
+})
 ```
 
 **useGqlPulseRawRequest**
 
-```vue
-// Low-level request returning headers, status, and errors. const res = await
-useGqlPulseRawRequest({ document: string, client: string, variables: TVariables,
+```ts
+// Low-level request returning headers, status, and errors.
+const res = await
+useGqlPulseRawRequest({
+  document: string,
+  client: string,
+  variables: TVariables,
 }) // { status, headers, data, extensions, errors? }
 ```
 
 **useGqlPulseClient**
 
-```vue
-// Access the underlying GraphQLClient instance. // Always auto-imported and
-cannot be excluded. const client = useGqlPulseClient('default') await
-client.request(query, variables)
+```ts
+// Access the underlying GraphQLClient instance.
+// Always auto-imported and cannot be excluded.
+const client = useGqlPulseClient('default') await client.request(query, variables)
 ```
 
 **useAsyncGqlPulse**
 
-```vue
+```ts
 // Nuxt-friendly async data fetching with optional payload cache. (SSR Friendly)
-const { data, pending, error } = await useAsyncGqlPulse({ key: 'characters',
-document, variables, client: 'default', withPayloadCache: true, })
+const { data, pending, error } = await useAsyncGqlPulse({
+  key: 'characters',
+  document,
+  variables,
+  client: 'default',
+  withPayloadCache: true,
+})
 ```
 
 **useAsyncGqlPulseWithCache**
 
-```vue
-// SPA-only sessionStorage caching. const data = await
-useAsyncGqlPulseWithCache({ key: 'characters', document, variables, })
+```ts
+// SPA-only sessionStorage caching.
+const data = await useAsyncGqlPulseWithCache({
+  key: 'characters',
+  document,
+  variables,
+})
 ```
 
 **useGqlPulseBatchRequests**
 
-```vue
-// Batch multiple queries into one request. const result = await
-useGqlPulseBatchRequests({ documents: [ { document: query1, variables: { id: 1 }
-}, { document: query2, variables: { id: 2 } }, ], client: 'default', })
+```ts
+// Batch multiple queries into one request.
+const result = await useGqlPulseBatchRequests({
+  documents: [
+    { document: query1, variables: { id: 1 } },
+    { document: query2, variables: { id: 2 } },
+  ],
+  client: 'default',
+})
 ```
 
 **useAsyncGqlPulseBatch**
 
-```vue
-// Nuxt-friendly async data fetching for batched requests with optional payload
-cache. (SSR Friendly) const { data, pending, error } = await
-useAsyncGqlPulseBatch({ key: 'batch-1', documents: [ { document: query1,
-variables: { id: 1 } }, { document: query2, variables: { id: 2 } }, ], client:
-'default', withPayloadCache: true, })
+```ts
+// Nuxt-friendly async data fetching for batched requests with optional payload cache. (SSR Friendly)
+const { data, pending, error } = await
+useAsyncGqlPulseBatch({
+  key: 'batch-1',
+  documents: [
+    { document: query1, variables: { id: 1 } },
+    { document: query2, variables: { id: 2 } },
+  ],
+  client: 'default',
+  withPayloadCache: true,
+})
 ```
 
 **useGqlPulseRequestWithCache**
 
-```vue
-// SPA-only sessionStorage caching for single requests. const result = await
-useGqlPulseRequestWithCache({ key: 'character-1', document, variables, })
+```ts
+// SPA-only sessionStorage caching for single requests.
+const result = await useGqlPulseRequestWithCache({
+  key: 'character-1',
+  document,
+  variables,
+})
 ```
 
 ### 🔌 Runtime Clients (plugins/gqlPulse.ts)
