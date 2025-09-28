@@ -22,8 +22,7 @@ export type ClientConfig = {
   options?: TRequestConfig
 }
 
-type TModuleComposables =
-  | 'useGqlPulseRequest'
+type TModuleComposables = | 'useGqlPulseRequest'
   | 'useGqlPulseRequestWithCache'
   | 'useGqlPulseBatchRequests'
   | 'useGqlPulseRawRequest'
@@ -95,14 +94,14 @@ export default defineNuxtModule<ModuleOptions>({
     // Merge runtime config with module options
     nuxt.options.runtimeConfig.public.gqlPulse = defu(
       nuxt.options.runtimeConfig.public.gqlPulse || {},
-      { clients: moduleOptions.clients, options: moduleOptions.options || {} }
+      { clients: moduleOptions.clients, options: moduleOptions.options || {} },
     )
 
     const typedClients = nuxt.options.runtimeConfig.public.gqlPulse
       .clients as ModuleOptions['clients']
 
     const clientKeys = Object.keys(typedClients)
-      .map((key) => `'${key}'`)
+      .map(key => `'${key}'`)
       .join(' | ')
 
     // Add types

@@ -4,7 +4,7 @@ import {
   type BatchResult,
 } from './useGqlPulseBatchRequests'
 import { useAsyncData, useNuxtApp } from '#app'
-import type { AsyncDataOptions } from 'nuxt/app'
+import type { AsyncDataOptions, AsyncData } from 'nuxt/app'
 import type { TVariables, TKeysOf } from '../../module'
 import type { TClients } from '#build/types/gql-pulse.d.ts'
 
@@ -20,7 +20,7 @@ export const useAsyncGqlPulseBatch = <
   client?: TClients
   withPayloadCache?: boolean
   options?: Omit<AsyncDataOptions<ResT, DataT, PickKeys, DefaultT>, 'lazy'>
-}) => {
+}): AsyncData<ResT, NuxtErrorDataT> & AsyncData<ResT, Error> => {
   const nuxtApp = useNuxtApp()
 
   const payloadCache = cxt.withPayloadCache
@@ -37,5 +37,5 @@ export const useAsyncGqlPulseBatch = <
       documents: cxt.requests,
     }),
     { ...cxt.options, ...payloadCache },
-  )
+  ) as AsyncData<ResT, NuxtErrorDataT> & AsyncData<ResT, Error>
 }
