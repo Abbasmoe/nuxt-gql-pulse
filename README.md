@@ -253,8 +253,7 @@ const data = await useGqlPulseRequest({
 
 ```ts
 // Low-level request returning headers, status, and errors.
-const res = await
-useGqlPulseRawRequest({
+const res = await useGqlPulseRawRequest({
   document: string,
   client: string,
   variables: TVariables,
@@ -266,7 +265,7 @@ useGqlPulseRawRequest({
 ```ts
 // Access the underlying GraphQLClient instance.
 // Always auto-imported and cannot be excluded.
-const client = useGqlPulseClient('default') await client.request(query, variables)
+const client = useGqlPulseClient('default')
 ```
 
 **useAsyncGqlPulse**
@@ -310,8 +309,7 @@ const result = await useGqlPulseBatchRequests({
 
 ```ts
 // Nuxt-friendly async data fetching for batched requests with optional payload cache. (SSR Friendly)
-const { data, pending, error } = await
-useAsyncGqlPulseBatch({
+const { data, pending, error } = await useAsyncGqlPulseBatch({
   key: 'batch-1',
   documents: [
     { document: query1, variables: { id: 1 } },
