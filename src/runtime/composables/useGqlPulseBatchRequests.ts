@@ -8,16 +8,24 @@ interface Result<Data extends object = object> {
   data: Data
 }
 
-type BatchResult = [Result, ...Result[]]
+export type GraphQLClientRequestHeaders = | Headers
+  | string[][]
+  | Record<string, string>
+
+export type BatchResult = [Result, ...Result[]]
+
+export interface BatchRequestConfig<V> {
+  document: string | DocumentNode
+  variables?: V
+  requestHeaders?: GraphQLClientRequestHeaders
+  signal?: AbortSignal
+}
 
 export const useGqlPulseBatchRequests = async <
   ResT extends BatchResult,
   V extends TVariables,
 >(cxt: {
-  documents: {
-    document: string | DocumentNode
-    variables?: V
-  }[]
+  documents: BatchRequestConfig<V>[]
   client?: TClients
 }) => {
   const gqlPulseClient = useGqlPulseClient(

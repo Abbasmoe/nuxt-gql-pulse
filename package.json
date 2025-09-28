@@ -2,12 +2,22 @@
   "name": "nuxt-gql-pulse",
   "version": "1.0.0",
   "description": "A Nuxt 3 module for making GraphQL requests with ease, leveraging the power of Nuxt's composables and VueUse.",
-  "repository": "your-org/nuxt-gql-pulse",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Abbasmoe/nuxt-gql-pulse.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Abbasmoe/nuxt-gql-pulse/issues"
+  },
+  "homepage": "https://github.com/Abbasmoe/nuxt-gql-pulse#readme",
   "license": "MIT",
   "type": "module",
   "author": {
     "name": "Abbas Mohamed",
-     "email": "Abbasmohamedbas@gmail.com"
+    "email": "Abbasmohamedbas@gmail.com"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "exports": {
     ".": {
@@ -26,12 +36,19 @@
   "files": [
     "dist"
   ],
+  "keywords": [
+    "gql-pulse",
+    "vue",
+    "graphql",
+    "nuxt-gql-pulse",
+    "nuxt"
+  ],
   "scripts": {
     "prepack": "nuxt-module-build build",
     "dev": "npm run dev:prepare && nuxi dev playground",
     "dev:build": "nuxi build playground",
     "dev:prepare": "nuxt-module-build build --stub && nuxt-module-build prepare && nuxi prepare playground",
-    "release": "npm run lint && npm run test && npm run prepack && changelogen --release && npm publish && git push --follow-tags",
+    "release": "release-it",
     "lint": "eslint .",
     "test": "vitest run",
     "test:watch": "vitest watch",
@@ -39,8 +56,11 @@
   },
   "dependencies": {
     "@nuxt/kit": "^4.0.3",
+    "defu": "^6.1.4",
     "graphql": "^16.11.0",
-    "graphql-request": "^7.2.0"
+    "graphql-request": "^7.2.0",
+    "@rollup/plugin-graphql": "^2.0.5",
+    "tslib": "^2.8.1"
   },
   "devDependencies": {
     "@nuxt/devtools": "^2.6.2",
@@ -48,13 +68,18 @@
     "@nuxt/module-builder": "^1.0.2",
     "@nuxt/schema": "^4.0.3",
     "@nuxt/test-utils": "^3.19.2",
-    "@rollup/plugin-graphql": "^2.0.5",
+    "@release-it/conventional-changelog": "^10.0.1",
+    "@rollup/pluginutils": "^5.3.0",
     "@types/node": "latest",
     "@vueuse/core": "^13.7.0",
     "@vueuse/nuxt": "^13.7.0",
     "changelogen": "^0.6.2",
     "eslint": "^9.33.0",
+    "estree-walker": "^3.0.3",
+    "graphql-tag": "^2.12.6",
     "nuxt": "^4.0.3",
+    "picomatch": "^4.0.3",
+    "release-it": "^19.0.4",
     "typescript": "~5.9.2",
     "vitest": "^3.2.4",
     "vue-tsc": "^3.0.5"

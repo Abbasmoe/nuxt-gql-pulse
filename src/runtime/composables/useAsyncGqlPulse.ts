@@ -5,7 +5,7 @@ import type { TClients } from '#build/types/gql-pulse.d.ts'
 import { useGqlPulseRequest } from './useGqlPulseRequest'
 import { useAsyncData, useNuxtApp } from '#app'
 
-export const useAsyncGqlPulse = async <
+export const useAsyncGqlPulse = <
   ResT,
   NuxtErrorDataT = unknown,
   DataT extends ResT = ResT,
@@ -18,7 +18,7 @@ export const useAsyncGqlPulse = async <
   client?: TClients
   withPayloadCache?: boolean
   options?: Omit<AsyncDataOptions<ResT, DataT, PickKeys, DefaultT>, 'lazy'>
-}): Promise<AsyncData<ResT, NuxtErrorDataT> & AsyncData<ResT, Error>> => {
+}): AsyncData<ResT, NuxtErrorDataT> & AsyncData<ResT, Error> => {
   const nuxtApp = useNuxtApp()
 
   const payloadCache = cxt.withPayloadCache
@@ -30,10 +30,10 @@ export const useAsyncGqlPulse = async <
 
   const key = cxt.key || typeof cxt.document === 'string' ? cxt.document as string : `${(cxt.document.definitions[0] as OperationDefinitionNode)?.name?.value}`
 
-  return await useAsyncData<ResT, NuxtErrorDataT, DataT, PickKeys, DefaultT>(
+  return useAsyncData<ResT, NuxtErrorDataT, DataT, PickKeys, DefaultT>(
     key,
-    async () =>
-      await useGqlPulseRequest<ResT>({
+    () =>
+      useGqlPulseRequest<ResT>({
         client: cxt.client,
         document: cxt.document,
         variables: cxt.variables,

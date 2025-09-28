@@ -5,11 +5,11 @@
     </h1>
 
     <div
-      v-if="charactersResponse"
+      v-if="data"
       class="character-grid"
     >
       <div
-        v-for="character in charactersResponse.characters.results"
+        v-for="character in data.characters.results"
         :key="character.id"
         class="character-card"
       >
@@ -69,7 +69,7 @@ const query = `
     }
   }
 `
-const charactersResponse = await useGqlPulseRequest<TCharactersResponse>({
+const { data } = await useAsyncGqlPulse<TCharactersResponse>({
   client: 'rickandmortyapi',
   document: query,
   variables: { page: 1 },

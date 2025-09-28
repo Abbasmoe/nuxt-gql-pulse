@@ -3,7 +3,7 @@
     <h1>Rick and Morty Characters</h1>
 
     <div
-      v-for="character in charactersResponse.characters.results"
+      v-for="character in data.characters.results"
       :key="character.id"
     >
       {{ character.name }}
@@ -13,7 +13,7 @@
 
 <script setup lang="ts">
 import Characters from '../graphql/characters.gql'
-import { useGqlPulseRequest } from '#imports'
+import { useAsyncGqlPulse } from '#imports'
 
 interface Character {
   id: string
@@ -31,7 +31,7 @@ interface TCharactersResponse {
   }
 }
 
-const charactersResponse = await useGqlPulseRequest<TCharactersResponse>({
+const { data } = await useAsyncGqlPulse<TCharactersResponse>({
   client: 'rickandmortyapi',
   document: Characters,
   variables: { page: 1 },
