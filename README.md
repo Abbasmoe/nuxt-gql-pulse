@@ -11,11 +11,9 @@
 
 A Nuxt 3/4 module for making GraphQL requests with ease, leveraging the power of Nuxt's composables for doing amazing things.
 
-- [✨ &nbsp;Release Notes](/CHANGELOG.md)
+  <!-- - [📓 &nbsp;Release Notes](/CHANGELOG.md) -->
   <!-- - [🏀 Online playground](https://stackblitz.com/github//Abbasmoe/nuxt-gql-pulse?file=playground%2Fapp.vue) -->
   <!-- - [📖 &nbsp;Documentation](https://example.com) -->
-
----
 
 ## ✨ Features
 
@@ -243,7 +241,7 @@ export {}
 ```ts
 // Make standard GraphQL requests.
 const data = await useGqlPulseRequest({
-  document, // string | DocumentNode 
+  document, // string | DocumentNode
   client: string, // defaults to first client
   variables: TVariables,
 })

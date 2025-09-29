@@ -56,10 +56,10 @@
   },
   "dependencies": {
     "@nuxt/kit": "^4.0.3",
+    "@rollup/plugin-graphql": "^2.0.5",
     "defu": "^6.1.4",
     "graphql": "^16.11.0",
     "graphql-request": "^7.2.0",
-    "@rollup/plugin-graphql": "^2.0.5",
     "tslib": "^2.8.1"
   },
   "devDependencies": {
@@ -68,7 +68,6 @@
     "@nuxt/module-builder": "^1.0.2",
     "@nuxt/schema": "^4.0.3",
     "@nuxt/test-utils": "^3.19.2",
-    "@release-it/conventional-changelog": "^10.0.1",
     "@rollup/pluginutils": "^5.3.0",
     "@types/node": "latest",
     "@vueuse/core": "^13.7.0",
