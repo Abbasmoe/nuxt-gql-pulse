@@ -1,6 +1,6 @@
 {
   "name": "nuxt-gql-pulse",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "A Nuxt 3 module for making GraphQL requests with ease, leveraging the power of Nuxt's composables and VueUse.",
   "repository": {
     "type": "git",
