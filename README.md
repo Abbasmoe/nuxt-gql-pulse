@@ -130,6 +130,7 @@ export default defineNuxtConfig({
      * Define your GraphQL clients
      */
     clients: {
+      // 'rickandmortyapi' was used in examples above instead of 'default'
       default: {
         /**
          * The client endpoint URL
@@ -143,10 +144,6 @@ export default defineNuxtConfig({
         options: {
           method?: 'GET' | 'POST';
           headers?: Headers | string[][] | Record<string, string> | (() => Headers | string[][] | Record<string, string>);
-          requestMiddleware?: (request: RequestExtendedInit<Variables>) => RequestExtendedInit<Variables> | Promise<RequestExtendedInit<Variables>>;
-          responseMiddleware?: (response: GraphQLClientResponse<unknown> | Error) => void;
-          jsonSerializer?: JsonSerializer;
-          body?: string | ReadableStream<any> | Blob | ArrayBuffer | ArrayBufferView<ArrayBuffer> | FormData | URLSearchParams | null;
           cache?: 'default' | 'force-cache' | 'no-cache' | 'no-store' | 'only-if-cached' | 'reload';
           credentials?: 'include' | 'omit' | 'same-origin';
           integrity?: string;
@@ -156,8 +153,6 @@ export default defineNuxtConfig({
           redirect?: 'error' | 'follow' | 'manual';
           referrer?: string;
           referrerPolicy?: '' | 'same-origin' | 'no-referrer' | 'no-referrer-when-downgrade' | 'origin' | 'origin-when-cross-origin' | 'strict-origin' | 'strict-origin-when-cross-origin' | 'unsafe-url';
-          signal?: AbortSignal | null;
-          window?: null;
           errorPolicy?: 'none' | 'ignore' | 'all';
         }
       },
@@ -329,12 +324,20 @@ const result = await useGqlPulseRequestWithCache({
 })
 ```
 
-### 🔌 Runtime Clients (plugins/gqlPulse.ts)
+### 🔌 Clients custom configuration (plugins/gqlPulse.ts)
 
-You can also provide runtime-defined clients via a Nuxt plugin:
+You can also provide custom configuration to clients via a Nuxt plugin:
 
 ```ts
 export default defineNuxtPlugin(() => {
+  const client = useGqlPulseClient('rickandmortyapi')
+  const secondClient = useGqlPulseClient('secondClient')
+
+  /**
+   * Request middleware
+   * Runs before every GraphQL request.
+   * You can modify headers, body, or any request config here.
+   */
   const requestMiddleware = async (
     request: RequestExtendedInit<Variables>
   ) => ({
@@ -345,31 +348,110 @@ export default defineNuxtPlugin(() => {
     },
   })
 
+  /**
+   * Response middleware
+   * Runs after every GraphQL response.
+   * Perfect for custom logging or error handling.
+   */
   const responseMiddleware = async (
     response: GraphQLClientResponse<unknown> | Error
   ) => {
-    // custom error handling...
+    if (response instanceof Error) {
+      console.error('❌ GraphQL error:', response.message)
+    } else {
+      console.log('✅ Response received:', response)
+    }
   }
 
-  const defaultClient = new GraphQLClient('defaultClient/api/graphql', {
-    requestMiddleware,
-    responseMiddleware,
-  })
+  // Apply middlewares to both clients
+  for (const c of [client, secondClient]) {
+    c.requestConfig.requestMiddleware = requestMiddleware
+    c.requestConfig.responseMiddleware = responseMiddleware
+  }
 
-  const secondClient = new GraphQLClient('secondClient/api/graphql', {
-    requestMiddleware,
-    responseMiddleware,
-  })
+  /**
+   * Optional: override other requestConfig options
+   */
+  // client.requestConfig.jsonSerializer = JSON
+  // client.requestConfig.body = JSON.stringify({ query: "{ characters { name } }" })
+  // client.requestConfig.signal = AbortSignal.timeout(5000)
+  // client.requestConfig.window = null
+})
+```
 
-  return {
-    provide: {
-      gqlPulse: {
-        default: defaultClient,
-        secondClient,
+### 👮🏽‍♂️ Authentication
+
+You can also provide Authentication headers in different ways:
+
+1. **Static headers** in `nuxt.config.ts`:
+
+```ts
+export default defineNuxtConfig({
+  gqlPulse: {
+    clients: {
+      default: {
+        endpoint: 'https://default.com/graphql',
+        options: {
+          headers: {
+            authorization: 'Bearer TOKEN_HERE',
+          },
+        },
       },
     },
-  }
+  },
 })
+```
+
+2. **Dynamic headers** using `requestMiddleware` in `plugins/gqlPulse.ts`:
+
+```ts
+const client = useGqlPulseClient('default')
+
+const requestMiddleware = async (request: RequestExtendedInit<Variables>) => {
+  const token = await getAuthTokenSomehow()
+  return {
+    ...request,
+    headers: {
+      ...request.headers,
+      authorization: `Bearer ${token}`,
+    },
+  }
+}
+
+client.requestConfig.requestMiddleware = requestMiddleware
+```
+
+3. **Per-request headers** using `useGqlPulseRequest` options:
+
+```ts
+const data = await useGqlPulseRequest({
+  document,
+  client: 'default',
+  variables,
+  requestOptions: {
+    headers: {
+      authorization: `Bearer ${token}`,
+    },
+  },
+})
+```
+
+4. using **setHeaders()** or **setHeader()** from `useGqlPulseClient()`:
+
+```ts
+const client = useGqlPulseClient('rickandmortyapi')
+
+// Replace all existing headers
+client.setHeaders({
+  Authorization: 'Bearer my-secret-token',
+  'Content-Type': 'application/json',
+})
+
+// Set one header without touching the rest
+client.setHeader('x-custom-header', 'my-value')
+
+// Point the client to a different GraphQL endpoint
+client.setEndpoint('https://custom-api.example.com/graphql')
 ```
 
 ## 🧑‍💻 Usage Examples

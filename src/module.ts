@@ -15,7 +15,15 @@ export type TKeysOf<T> = Array<
 
 export type TVariables = Record<string, unknown>
 
-export type TRequestConfig = GraphQLClient['requestConfig']
+export type TRequestConfig = Omit<
+  GraphQLClient['requestConfig'],
+  | 'requestMiddleware'
+  | 'responseMiddleware'
+  | 'jsonSerializer'
+  | 'signal'
+  | 'body'
+  | 'window'
+>
 
 export type ClientConfig = {
   endpoint: string
@@ -50,9 +58,6 @@ export default defineNuxtModule<ModuleOptions>({
   },
   setup(moduleOptions, nuxt) {
     const resolver = createResolver(import.meta.url)
-
-    // Provide the plugin
-    addPlugin(resolver.resolve('./runtime/plugin'))
 
     // Auto-import the main composable
     addImports({
@@ -91,18 +96,34 @@ export default defineNuxtModule<ModuleOptions>({
       config.plugins.push(rollupGraphql())
     })
 
-    // Merge runtime config with module options
+    // Merge module options
+    nuxt.options.runtimeConfig.gqlPulse = defu(
+      nuxt.options.runtimeConfig.gqlPulse || {},
+      { clients: moduleOptions.clients, options: moduleOptions.options || {} },
+    )
+
     nuxt.options.runtimeConfig.public.gqlPulse = defu(
       nuxt.options.runtimeConfig.public.gqlPulse || {},
       { clients: moduleOptions.clients, options: moduleOptions.options || {} },
     )
 
-    const typedClients = nuxt.options.runtimeConfig.public.gqlPulse
-      .clients as ModuleOptions['clients']
+    const typedClients = Object.assign(
+      nuxt.options.runtimeConfig.public.gqlPulse.clients as Record<
+        string,
+        ClientConfig
+      >,
+      nuxt.options.runtimeConfig.gqlPulse.clients as Record<
+        string,
+        ClientConfig
+      >,
+    ) as ModuleOptions['clients']
 
     const clientKeys = Object.keys(typedClients)
       .map(key => `'${key}'`)
       .join(' | ')
+
+    // Provide the plugin
+    addPlugin(resolver.resolve('./runtime/plugin'))
 
     // Add types
     addTypeTemplate({
