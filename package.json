@@ -38,10 +38,20 @@
   ],
   "keywords": [
     "gql-pulse",
+    "gql pulse",
+    "graphql pulse",
+    "nuxt graphql pulse",
+    "nuxt pulse",
     "vue",
     "graphql",
     "nuxt-gql-pulse",
-    "nuxt"
+    "nuxt",
+    "nuxt3",
+    "nuxt4",
+    "composables",
+    "graphql-request",
+    "vueuse",
+    "typescript"
   ],
   "scripts": {
     "prepack": "nuxt-module-build build",
