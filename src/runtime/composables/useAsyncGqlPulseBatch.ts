@@ -6,7 +6,6 @@ import {
 import { useAsyncData, useNuxtApp } from '#app'
 import type { AsyncDataOptions, AsyncData } from 'nuxt/app'
 import type { TVariables, TKeysOf } from '../../module'
-import type { TClients } from '#build/types/gql-pulse.d.ts'
 
 export const useAsyncGqlPulseBatch = <
   ResT extends BatchResult,
@@ -17,7 +16,7 @@ export const useAsyncGqlPulseBatch = <
 >(cxt: {
   key: string
   requests: BatchRequestConfig<TVariables>[]
-  client?: TClients
+  client?: TGqlPulseClientKey
   withPayloadCache?: boolean
   options?: Omit<AsyncDataOptions<ResT, DataT, PickKeys, DefaultT>, 'lazy'>
 }): AsyncData<ResT, NuxtErrorDataT> & AsyncData<ResT, Error> => {

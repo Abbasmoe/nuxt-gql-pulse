@@ -1,7 +1,6 @@
 import type { DocumentNode, OperationDefinitionNode } from 'graphql'
 import type { AsyncDataOptions, AsyncData } from 'nuxt/app'
 import type { TVariables, TKeysOf } from '../../module'
-import type { TClients } from '#build/types/gql-pulse.d.ts'
 import { useGqlPulseRequest } from './useGqlPulseRequest'
 import { useAsyncData, useNuxtApp } from '#app'
 
@@ -15,7 +14,7 @@ export const useAsyncGqlPulse = <
   key?: string
   document: string | DocumentNode
   variables?: TVariables
-  client?: TClients
+  client?: TGqlPulseClientKey
   withPayloadCache?: boolean
   options?: Omit<AsyncDataOptions<ResT, DataT, PickKeys, DefaultT>, 'lazy'>
 }): AsyncData<ResT, NuxtErrorDataT> & AsyncData<ResT, Error> => {

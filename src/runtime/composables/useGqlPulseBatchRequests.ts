@@ -1,7 +1,5 @@
 import type { DocumentNode } from 'graphql'
-import type { GraphQLClient } from 'graphql-request'
 import type { TVariables } from '../../module'
-import type { TClients } from '#build/types/gql-pulse.d.ts'
 import { useGqlPulseClient } from './useGqlPulseClient'
 
 interface Result<Data extends object = object> {
@@ -26,11 +24,9 @@ export const useGqlPulseBatchRequests = async <
   V extends TVariables,
 >(cxt: {
   documents: BatchRequestConfig<V>[]
-  client?: TClients
+  client?: TGqlPulseClientKey
 }) => {
-  const gqlPulseClient = useGqlPulseClient(
-    cxt.client === undefined ? 'default' : cxt.client,
-  ) as GraphQLClient
+  const gqlPulseClient = useGqlPulseClient(cxt.client)
 
   return await gqlPulseClient.batchRequests<ResT, TVariables>(cxt.documents)
 }

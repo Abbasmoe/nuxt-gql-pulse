@@ -1,13 +1,12 @@
 import type { DocumentNode } from 'graphql'
 import type { TVariables } from '../../module'
-import type { TClients } from '#build/types/gql-pulse.d.ts'
 import { StorageSerializers, useSessionStorage } from '@vueuse/core'
 import { useGqlPulseRequest } from './useGqlPulseRequest'
 
 type TGqlPulseRequestWithSessionCacheOptions = {
   key: string
   document: string | DocumentNode
-  client?: TClients
+  client?: TGqlPulseClientKey
   variables?: TVariables
 }
 

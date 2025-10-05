@@ -19,6 +19,10 @@ A Nuxt 3/4 module for making GraphQL requests with ease, leveraging the power of
 
 - 🔌 Multiple GraphQL client support
 - ⚡ Composables built on Nuxt's `useAsyncData`
+- 🎯 Simple API, minimal boilerplate
+- 🧩 Flexible request options per-client and per-request
+- 🔄 SSR-friendly with Nuxt payload caching
+- 🦾 **Type Strong:** type-safe client names (via global `TGqlPulseClientKey` type)
 - 🗂️ Caching options:
   - **sessionStorage** (SPA-only) for persistent client cache
   - **Nuxt payload** (SSR-friendly) for server-side hydration
@@ -193,17 +197,16 @@ export default defineNuxtConfig({
 })
 ```
 
-**🔑 Type Declarations (gql-pulse.d.ts)**
+**🔑 Type Declarations (index.d.ts)**
+
+if you want to have type-safe client names in your project, 
+you can declare the `TGqlPulseClientKey` type globally in your project.
+normally this is auto-generated in `.nuxt/types/gql-pulse.d.ts` during build, 
+but you can also declare it manually in your project for better DX.
 
 ```ts
-import type { GraphQLClient } from 'graphql-request'
-
-export type TClients = 'rickandmortyapi'
-
-declare module '#app' {
-  interface NuxtApp {
-    $gqlPulse: Record<TClients, GraphQLClient>
-  }
+declare global {
+  type TGqlPulseClientKey = 'rickandmortyapi'
 }
 
 export {}
@@ -213,7 +216,7 @@ export {}
 
 🔧 API quick reference (signatures)
 
-- useGqlPulseClient(clientName: string): GraphQLClient — get raw client
+- useGqlPulseClient(clientName: string | "default"): GraphQLClient — get raw client
 - useGqlPulseRequest<T>(opts): Promise<T>
   opts = { document, client?, variables? }
 - useGqlPulseRawRequest<T>(opts): Promise<{ status, headers, data, errors?, extensions? }>

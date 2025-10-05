@@ -107,20 +107,7 @@ export default defineNuxtModule<ModuleOptions>({
       { clients: moduleOptions.clients, options: moduleOptions.options || {} },
     )
 
-    const typedClients = Object.assign(
-      nuxt.options.runtimeConfig.public.gqlPulse.clients as Record<
-        string,
-        ClientConfig
-      >,
-      nuxt.options.runtimeConfig.gqlPulse.clients as Record<
-        string,
-        ClientConfig
-      >,
-    ) as ModuleOptions['clients']
-
-    const clientKeys = Object.keys(typedClients)
-      .map(key => `'${key}'`)
-      .join(' | ')
+    const clientKeyUnion = Object.keys(moduleOptions.clients).map(key => `'${key}'`).join(' | ') || 'never'
 
     // Provide the plugin
     addPlugin(resolver.resolve('./runtime/plugin'))
@@ -133,16 +120,19 @@ export default defineNuxtModule<ModuleOptions>({
           import type { GraphQLClient } from 'graphql-request'
           import type { DocumentNode } from 'graphql'
 
-          export type TClients = ${clientKeys} | string
+          declare global {
+            type TGqlPulseClientKey = ${clientKeyUnion};
+            type TGqlPulseClients = Record<TGqlPulseClientKey, GraphQLClient>
+          }
 
           declare module '#app' {
             interface NuxtApp {
-                $gqlPulse: Record<TClients, GraphQLClient>
+                $gqlPulse: TGqlPulseClients
             }
 
             declare module 'vue' {
-              interface ComponentCustomProperties {
-                $gqlPulse: Record<TClients, GraphQLClient>
+                interface ComponentCustomProperties {
+                  $gqlPulse: TGqlPulseClients
               }
             }
 
@@ -159,7 +149,8 @@ export default defineNuxtModule<ModuleOptions>({
             declare module '*.graphqls' {
               const Schema: DocumentNode
               export default Schema
-              }
+            }
+
           }
 
           export {}

@@ -1,11 +1,10 @@
 import type { TVariables } from '../../module'
-import type { TClients } from '#build/types/gql-pulse.d.ts'
 import type { GraphQLError } from 'graphql'
 import { useGqlPulseClient } from './useGqlPulseClient'
 
 export const useGqlPulseRawRequest = async <ResT>(cxt: {
   document: string
-  client?: TClients
+  client?: TGqlPulseClientKey
   variables?: TVariables
 }): Promise<{
   status: number
@@ -14,9 +13,7 @@ export const useGqlPulseRawRequest = async <ResT>(cxt: {
   extensions?: unknown
   errors?: GraphQLError[]
 }> => {
-  const gqlPulseClient = useGqlPulseClient(
-    cxt.client === undefined ? 'default' : cxt.client,
-  )
+  const gqlPulseClient = useGqlPulseClient(cxt.client)
 
   return await gqlPulseClient.rawRequest<ResT, TVariables>({
     query: cxt.document,

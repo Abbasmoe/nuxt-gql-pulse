@@ -1,7 +1,6 @@
 import type { AsyncDataOptions } from 'nuxt/app'
 import type { DocumentNode } from 'graphql'
 import type { TVariables, TKeysOf } from '../../module'
-import type { TClients } from '#build/types/gql-pulse.d.ts'
 import { StorageSerializers, useSessionStorage } from '@vueuse/core'
 import { useAsyncGqlPulse } from './useAsyncGqlPulse'
 
@@ -26,7 +25,7 @@ export const useAsyncGqlPulseWithCache = async <
   key: string
   document: string | DocumentNode
   variables?: TVariables
-  client?: TClients
+  client?: TGqlPulseClientKey
   options?: Omit<AsyncDataOptions<ResT, DataT, PickKeys, DefaultT>, 'lazy'>
 }) => {
   // Use sessionStorage to cache data
