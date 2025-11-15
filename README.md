@@ -34,7 +34,6 @@ A Nuxt 3/4 module for making GraphQL requests with ease, leveraging the power of
   - `useGqlPulseRawRequest(...)` — low-level raw response
   - `useGqlPulseRequestWithCache(...)` — sessionStorage cache (SPA)
   - `useAsyncGqlPulse(...)` — SSR-friendly async data
-  - `useAsyncGqlPulseWithCache(...)` — SPA async with sessionStorage
   - `useGqlPulseBatchRequests(...)` — batch multiple queries
   - `useAsyncGqlPulseBatch(...)` — async batch with optional payload cache
 
@@ -185,7 +184,6 @@ export default defineNuxtConfig({
      *  'useGqlPulseBatchRequests',
      *  'useGqlPulseRawRequest',
      *  'useAsyncGqlPulse',
-     *  'useAsyncGqlPulseWithCache',
      *  'useAsyncGqlPulseBatch',
      * ]
      *
@@ -199,9 +197,9 @@ export default defineNuxtConfig({
 
 **🔑 Type Declarations (index.d.ts)**
 
-if you want to have type-safe client names in your project, 
+if you want to have type-safe client names in your project,
 you can declare the `TGqlPulseClientKey` type globally in your project.
-normally this is auto-generated in `.nuxt/types/gql-pulse.d.ts` during build, 
+normally this is auto-generated in `.nuxt/types/gql-pulse.d.ts` during build,
 but you can also declare it manually in your project for better DX.
 
 ```ts
@@ -220,16 +218,15 @@ export {}
 - useGqlPulseRequest<T>(opts): Promise<T>
   opts = { document, client?, variables? }
 - useGqlPulseRawRequest<T>(opts): Promise<{ status, headers, data, errors?, extensions? }>
-- useGqlPulseRequestWithCache<T>(opts): Promise<RemovableRef<T>> — sessionStorage cache (SPA)
+- useGqlPulseRequestWithCache<T>(opts): Promise<RemovableRef<T>> — sessionStorage cache (SPA via @vueuse/core)
 - useAsyncGqlPulse(opts): AsyncDataReturn — SSR-friendly useAsyncData wrapper
-- useAsyncGqlPulseWithCache(opts): AsyncDataReturn — SPA sessionStorage cache variant
 - useGqlPulseBatchRequests(opts): Promise<BatchResult> — batch many queries at once
 - useAsyncGqlPulseBatch(opts): AsyncDataReturn — batched useAsyncData with optional payload cache
 
 🔁 Caching: SSR vs SPA
 
-- withPayloadCache / useAsyncGqlPulse → SSR-friendly, data is stored in Nuxt payload and reused during client hydration (no double-fetch).
-- \*WithCache variants & useGqlPulseRequestWithCache → SPA only (use sessionStorage via @vueuse/core).
+- `withPayloadCache` / `useAsyncGqlPulse` → SSR-friendly, data is stored in Nuxt payload and reused during client hydration (no double-fetch).
+- `*WithCache` variants & `useGqlPulseRequestWithCache` → SPA only. They use `sessionStorage` via `@vueuse/core`, providing client-persistent caching across reloads.
   Use these for client-persistent caching across reloads; not suitable for SSR-only pages.
 
 #### 🔧 API details
@@ -277,17 +274,6 @@ const { data, pending, error } = await useAsyncGqlPulse({
 })
 ```
 
-**useAsyncGqlPulseWithCache**
-
-```ts
-// SPA-only sessionStorage caching.
-const data = await useAsyncGqlPulseWithCache({
-  key: 'characters',
-  document,
-  variables,
-})
-```
-
 **useGqlPulseBatchRequests**
 
 ```ts
@@ -317,6 +303,13 @@ const { data, pending, error } = await useAsyncGqlPulseBatch({
 ```
 
 **useGqlPulseRequestWithCache**
+
+This feature depends on `@vueuse/core`. Install it only if you intend to use this SPA-only caching API.  
+Tree-shaking ensures that only the specific VueUse utilities you import are included, so it will not increase your bundle size.
+
+```bash
+npm i -D @vueuse/core
+```
 
 ```ts
 // SPA-only sessionStorage caching for single requests.

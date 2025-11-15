@@ -35,7 +35,6 @@ type TModuleComposables = | 'useGqlPulseRequest'
   | 'useGqlPulseBatchRequests'
   | 'useGqlPulseRawRequest'
   | 'useAsyncGqlPulse'
-  | 'useAsyncGqlPulseWithCache'
   | 'useAsyncGqlPulseBatch'
 
 export interface ModuleOptions {
@@ -71,7 +70,6 @@ export default defineNuxtModule<ModuleOptions>({
       'useGqlPulseBatchRequests',
       'useGqlPulseRawRequest',
       'useAsyncGqlPulse',
-      'useAsyncGqlPulseWithCache',
       'useAsyncGqlPulseBatch',
     ] as const
 
