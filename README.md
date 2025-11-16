@@ -22,6 +22,7 @@ A Nuxt 3/4 module for making GraphQL requests with ease, leveraging the power of
 - 🎯 Simple API, minimal boilerplate
 - 🧩 Flexible request options per-client and per-request
 - 🔄 SSR-friendly with Nuxt payload caching
+- 🛰 Nitro-ready: use GraphQL clients directly in `server/api` via `event.context.$gqlPulse`
 - 🦾 **Type Strong:** type-safe client names (via global `TGqlPulseClientKey` type)
 - 🗂️ Caching options:
   - **sessionStorage** (SPA-only) for persistent client cache
@@ -65,7 +66,7 @@ export default defineNuxtConfig({
 
 That’s it! You can now use Nuxt GQL Pulse in your Nuxt app ✨
 
-### Example: Query characters from Rick & Morty API
+### Example: Query characters from Rick & Morty API (client/composables)
 
 ```vue
 <script setup lang="ts">
@@ -102,6 +103,41 @@ const { data } = await useAsyncGqlPulse<{
     </ul>
   </div>
 </template>
+```
+
+### Example: Use in Nitro server route (server/api)
+
+Nuxt GQL Pulse exposes your configured clients to Nitro via `event.context.$gqlPulse`, so you can reuse the same GraphQL setup in server handlers.
+```ts
+// server/api/characters.get.ts
+import Characters from '../graphql/characters.gql'
+
+export default defineEventHandler(async (event) => {
+  const client = event.context.$gqlPulse.rickandmortyapi
+
+  const data = await client.request(Characters)
+
+  return data
+})
+```
+This allows you to make typed GraphQL requests directly inside server/api without redefining clients or endpoints.
+
+You can explore a running version of this example in the Playground, including client-side and server-side usage:
+
+👉 [Playground](./playground/pages/server.vue)
+
+On the client, you simply consume that API with useFetch / useAsyncData:
+
+```vue
+<script setup lang="ts">
+
+const { data } = await useFetch<{
+  characters: {
+    results: { id: string; name: string; status: string; species: string }[]
+  }
+}>('/api/characters')
+
+</script>
 ```
 
 ## 🔄 Comparison — Why choose Nuxt GQL Pulse?

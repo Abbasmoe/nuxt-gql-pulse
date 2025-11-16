@@ -1,6 +1,7 @@
 import {
   defineNuxtModule,
   addPlugin,
+  addServerPlugin,
   createResolver,
   addImports,
   addTypeTemplate,
@@ -94,6 +95,15 @@ export default defineNuxtModule<ModuleOptions>({
       config.plugins.push(rollupGraphql())
     })
 
+    // Extend Nitro config (graphql loader)
+    nuxt.hook('nitro:config', (nitroConfig) => {
+      nitroConfig.rollupConfig ||= {}
+      if (!Array.isArray(nitroConfig.rollupConfig.plugins)) {
+        nitroConfig.rollupConfig.plugins = []
+      }
+      nitroConfig.rollupConfig.plugins.push(rollupGraphql())
+    })
+
     // Merge module options
     nuxt.options.runtimeConfig.gqlPulse = defu(
       nuxt.options.runtimeConfig.gqlPulse || {},
@@ -107,8 +117,9 @@ export default defineNuxtModule<ModuleOptions>({
 
     const clientKeyUnion = Object.keys(moduleOptions.clients).map(key => `'${key}'`).join(' | ') || 'never'
 
-    // Provide the plugin
+    // Provide the plugins
     addPlugin(resolver.resolve('./runtime/plugin'))
+    addServerPlugin(resolver.resolve('./runtime/nitro-plugin'))
 
     // Add types
     addTypeTemplate({
@@ -117,6 +128,7 @@ export default defineNuxtModule<ModuleOptions>({
         return `
           import type { GraphQLClient } from 'graphql-request'
           import type { DocumentNode } from 'graphql'
+          import type { H3EventContext } from 'h3'
 
           declare global {
             type TGqlPulseClientKey = ${clientKeyUnion};
@@ -151,9 +163,18 @@ export default defineNuxtModule<ModuleOptions>({
 
           }
 
+          declare module 'h3' {
+              interface H3EventContext {
+                $gqlPulse: TGqlPulseClients
+            }
+          }
+
           export {}
         `
       },
+    }, {
+      nuxt: true,
+      nitro: true,
     })
   },
 })

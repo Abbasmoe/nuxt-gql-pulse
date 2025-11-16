@@ -1,87 +1,44 @@
 <template>
-  <div class="character-list-container">
-    <h1 class="title">
-      Rick and Morty Characters
-    </h1>
+  <div>
+    <nav class="navigation">
+      <NuxtLink to="/">Home</NuxtLink>
+      <NuxtLink to="/server">Server</NuxtLink>
+    </nav>
 
-    <div
-      v-if="data"
-      class="character-grid"
-    >
-      <div
-        v-for="character in data.characters.results"
-        :key="character.id"
-        class="character-card"
-      >
-        <img
-          :src="character.image"
-          :alt="character.name"
-          class="character-image"
-        >
-        <div class="character-details">
-          <h2 class="character-name">
-            {{ character.name }}
-          </h2>
-          <p class="character-info">
-            Status: {{ character.status }}
-          </p>
-          <p class="character-info">
-            Species: {{ character.species }}
-          </p>
-          <p class="character-info">
-            Gender: {{ character.gender }}
-          </p>
-        </div>
-      </div>
-    </div>
+    <main>
+      <NuxtPage />
+    </main>
   </div>
 </template>
 
-<script setup lang="ts">
-interface Character {
-  id: string
-  name: string
-  status: string
-  species: string
-  type: string
-  gender: string
-  image: string
+<style>
+body {
+  font-family: sans-serif;
+}
+.navigation {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin-top: 20px;
+  margin-bottom: 20px;
 }
 
-interface TCharactersResponse {
-  characters: {
-    results: Character[]
-  }
+.navigation a {
+  color: #2c3e50;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 18px;
 }
 
-const query = `
-  query ($page: Int) {
-    characters(page: $page) {
-      results {
-        id
-        name
-        status
-        species
-        type
-        gender
-        image
-      }
-    }
-  }
-`
-const { data } = await useAsyncGqlPulse<TCharactersResponse>({
-  client: 'rickandmortyapi',
-  document: query,
-  variables: { page: 1 },
-})
-</script>
+.navigation a.router-link-exact-active {
+  color: #42b983;
+  text-decoration: underline;
+}
 
-<style scoped>
 .character-list-container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
-  font-family: sans-serif;
 }
 
 .title {
@@ -102,6 +59,7 @@ const { data } = await useAsyncGqlPulse<TCharactersResponse>({
   overflow: hidden;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s;
+  background: #fff;
 }
 
 .character-card:hover {
