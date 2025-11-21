@@ -11,21 +11,23 @@ export default defineNitroPlugin((nitroApp) => {
   const commonOptions = gqlPulse?.options ?? {}
   const definedClients = gqlPulse?.clients ?? {}
 
-  const graphClients = Object.entries(definedClients).reduce(
-    (acc, [clientName, clientConfig]) => {
-      acc[clientName as keyof typeof definedClients] = new GraphQLClient(
-        clientConfig.endpoint,
-        {
-          ...commonOptions,
-          ...clientConfig.options,
-        },
-      )
-      return acc
-    },
-    {} as Record<keyof typeof definedClients, GraphQLClient>,
+  const clientConfigs = Object.entries(definedClients).map(
+    ([clientName, clientConfig]) => ({
+      name: clientName as keyof typeof definedClients,
+      endpoint: clientConfig.endpoint,
+      options: {
+        ...commonOptions,
+        ...clientConfig.options,
+      },
+    }),
   )
 
   nitroApp.hooks.hook('request', (event) => {
+    const graphClients = clientConfigs.reduce((acc, cfg) => {
+      acc[cfg.name] = new GraphQLClient(cfg.endpoint, cfg.options)
+      return acc
+    }, {} as Record<keyof typeof definedClients, GraphQLClient>)
+
     event.context.$gqlPulse = graphClients
   })
 })

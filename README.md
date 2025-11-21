@@ -108,6 +108,7 @@ const { data } = await useAsyncGqlPulse<{
 ### Example: Use in Nitro server route (server/api)
 
 Nuxt GQL Pulse exposes your configured clients to Nitro via `event.context.$gqlPulse`, so you can reuse the same GraphQL setup in server handlers.
+
 ```ts
 // server/api/characters.get.ts
 import Characters from '../graphql/characters.gql'
@@ -120,6 +121,7 @@ export default defineEventHandler(async (event) => {
   return data
 })
 ```
+
 This allows you to make typed GraphQL requests directly inside server/api without redefining clients or endpoints.
 
 You can explore a running version of this example in the Playground, including client-side and server-side usage:
@@ -130,13 +132,11 @@ On the client, you simply consume that API with useFetch / useAsyncData:
 
 ```vue
 <script setup lang="ts">
-
 const { data } = await useFetch<{
   characters: {
     results: { id: string; name: string; status: string; species: string }[]
   }
 }>('/api/characters')
-
 </script>
 ```
 
@@ -408,6 +408,54 @@ export default defineNuxtPlugin(() => {
   // client.requestConfig.body = JSON.stringify({ query: "{ characters { name } }" })
   // client.requestConfig.signal = AbortSignal.timeout(5000)
   // client.requestConfig.window = null
+})
+```
+
+### ⚡ Server-side middleware (Nitro `server/plugins`)
+
+If you are calling GraphQL from `server/api` routes (or other Nitro handlers), client-side plugins in `plugins/` will **not** apply to those server-side requests.
+
+Nuxt GQL Pulse exposes your configured clients on the Nitro event via `event.context.$gqlPulse`.
+
+To add per-request middleware (e.g. attach auth tokens from cookies), define a Nitro plugin under `server/plugins/`:
+
+```ts
+import type { RequestInitExtended, ResponseMiddleware } from 'graphql-request'
+
+export default defineNitroPlugin((nitroApp) => {
+  const responseMiddleware: ResponseMiddleware = async (response) => {
+    if (response instanceof Error) {
+      console.error('❌ GraphQL error:', response.message)
+    } else {
+      console.log('✅ GraphQL response:', {
+        status: response.status,
+        hasErrors: Boolean(response.errors?.length),
+      })
+    }
+  }
+
+  nitroApp.hooks.hook('request', (event) => {
+    // Read user token from cookies (or headers)
+    const token = getCookie(event, 'auth_token')
+
+    const requestMiddleware = async (request: RequestInitExtended) => ({
+      ...request,
+      headers: {
+        ...request.headers,
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+    })
+
+    const clients = event.context.$gqlPulse
+    if (!clients) return
+
+    // Apply middleware to all configured clients
+    for (const client of Object.values(clients)) {
+      client.requestConfig.requestMiddleware = requestMiddleware
+      client.requestConfig.responseMiddleware = responseMiddleware
+    }
+  })
 })
 ```
 
