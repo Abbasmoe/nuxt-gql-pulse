@@ -70,7 +70,7 @@ That’s it! You can now use Nuxt GQL Pulse in your Nuxt app ✨
 
 ```vue
 <script setup lang="ts">
-const query = /* GraphQL */ `
+const query = `
   query {
     characters(page: 1) {
       results {
@@ -271,7 +271,7 @@ export {}
 
 ```ts
 // Make standard GraphQL requests.
-const data = await useGqlPulseRequest({
+const data = await useGqlPulseRequest<ResponseType>({
   document, // string | DocumentNode
   client: string, // defaults to first client
   variables: TVariables,
@@ -282,7 +282,7 @@ const data = await useGqlPulseRequest({
 
 ```ts
 // Low-level request returning headers, status, and errors.
-const res = await useGqlPulseRawRequest({
+const res = await useGqlPulseRawRequest<ResponseType>({
   document: string,
   client: string,
   variables: TVariables,
@@ -301,7 +301,10 @@ const client = useGqlPulseClient('default')
 
 ```ts
 // Nuxt-friendly async data fetching with optional payload cache. (SSR Friendly)
-const { data, pending, error } = await useAsyncGqlPulse({
+const { data, pending, error } = await useAsyncGqlPulse<
+  ResponseType,
+  ErrorType
+>({
   key: 'characters',
   document,
   variables,
@@ -327,9 +330,21 @@ const result = await useGqlPulseBatchRequests({
 
 ```ts
 // Nuxt-friendly async data fetching for batched requests with optional payload cache. (SSR Friendly)
-const { data, pending, error } = await useAsyncGqlPulseBatch({
+type BatchResult = [
+  {
+    data: ResponseType1
+  },
+  {
+    data: ResponseType2
+  }
+]
+
+const { data, pending, error } = await useAsyncGqlPulseBatch<
+  BatchResult,
+  [ErrorType1, ErrorType2]
+>({
   key: 'batch-1',
-  documents: [
+  requests: [
     { document: query1, variables: { id: 1 } },
     { document: query2, variables: { id: 2 } },
   ],
@@ -349,7 +364,7 @@ npm i -D @vueuse/core
 
 ```ts
 // SPA-only sessionStorage caching for single requests.
-const result = await useGqlPulseRequestWithCache({
+const result = await useGqlPulseRequestWithCache<ResponseType>({
   key: 'character-1',
   document,
   variables,
